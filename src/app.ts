@@ -1,5 +1,4 @@
 import dotenv from "dotenv";
-import path from "path";
 import express, { Express, NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
 import openAiRoute from "./routes/openai";
@@ -69,12 +68,6 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     message: errorMessage,
     stack: err.stack,
   });
-});
-
-app.use(express.static(path.join(__dirname, "/client/build")));
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '/client/build', 'index.html'));
 });
 
 app.listen(process.env.PORT || 8800, () => {
