@@ -4,8 +4,9 @@
   "description": "",
   "main": "src/app.js",
   "scripts": {
-    "build": "nodemon src/app.ts",
-    "start": "concurrently \"tsc -w\" \"nodemon dist/js/app.js\""
+    "build": "tsc",
+    "start": "concurrently \"tsc -w\" \"node dist/js/app.js\"",
+    "dev": "concurrently \"tsc -w\" \"nodemon dist/js/app.js\""
   },
   "keywords": [],
   "author": "Abednego Edet",
