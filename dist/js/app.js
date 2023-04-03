@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
+const path_1 = __importDefault(require("path"));
 const express_1 = __importDefault(require("express"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const openai_1 = __importDefault(require("./routes/openai"));
@@ -71,9 +72,9 @@ app.use((err, req, res, next) => {
         stack: err.stack,
     });
 });
-app.use(express_1.default.static(path.join(__dirname, "/client/build")));
+app.use(express_1.default.static(path_1.default.join(__dirname, "/client/build")));
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '/client/build', 'index.html'));
+    res.sendFile(path_1.default.join(__dirname, '/client/build', 'index.html'));
 });
 app.listen(process.env.PORT || 8800, () => {
     connect();

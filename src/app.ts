@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import path from "path";
 import express, { Express, NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
 import openAiRoute from "./routes/openai";
