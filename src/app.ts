@@ -66,7 +66,7 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   });
 });
 
-app.listen(process.env.PORT || 8800, () => {
+app.listen(() => {
   connect();
   console.log("Connected to backend.");
 });

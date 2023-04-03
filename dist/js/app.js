@@ -24,7 +24,7 @@ const cors_1 = __importDefault(require("cors"));
 const app = (0, express_1.default)();
 dotenv_1.default.config();
 mongoose_1.default.set("strictQuery", false);
-const PORT = process.env.PORT || 8800;
+// const PORT: string | number = process.env.PORT || 8800;
 const MONGO_URL = process.env.MONGO;
 const connect = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -68,7 +68,7 @@ app.use((err, req, res, next) => {
         stack: err.stack,
     });
 });
-app.listen(PORT, () => {
+app.listen(() => {
     connect();
     console.log("Connected to backend.");
 });
