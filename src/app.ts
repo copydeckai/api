@@ -12,7 +12,7 @@ const app: Express = express();
 dotenv.config();
 mongoose.set("strictQuery", false);
 
-const PORT: number = process.env.PORT || 8800;
+// const PORT: string | number = process.env.PORT || 8800;
 const MONGO_URL: string | undefined = process.env.MONGO;
 
 const connect = async () => {
@@ -66,7 +66,7 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   });
 });
 
-app.listen(PORT, () => {
+app.listen(process.env.PORT || 8800, () => {
   connect();
   console.log("Connected to backend.");
 });

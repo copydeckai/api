@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "build": "CI= npm run build",
+    "build": "ts-node-esm src/app.ts",
     "start": "concurrently \"tsc -w\" \"nodemon dist/js/app.js\""
   },
   "keywords": [],
@@ -36,6 +36,8 @@
     "openai": "^3.1.0",
     "passport": "^0.6.0",
     "passport-google-oauth": "^2.0.0",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.3"
   }
 }
