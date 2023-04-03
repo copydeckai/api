@@ -2,9 +2,9 @@
   "name": "@copydeck/api",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "src/app.js",
   "scripts": {
-    "build": "tsc",
+    "build": "nodemon src/app.ts",
     "start": "concurrently \"tsc -w\" \"nodemon dist/js/app.js\""
   },
   "keywords": [],
