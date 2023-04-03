@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "build": "tsc",
+    "build": "CI= npm run build",
     "start": "concurrently \"tsc -w\" \"nodemon dist/js/app.js\""
   },
   "keywords": [],
