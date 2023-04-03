@@ -24,7 +24,7 @@ const cors_1 = __importDefault(require("cors"));
 const app = (0, express_1.default)();
 dotenv_1.default.config();
 mongoose_1.default.set("strictQuery", false);
-// const PORT: number = process.env.PORT || 8800;
+const PORT = process.env.PORT || 8800;
 const MONGO_URL = process.env.MONGO;
 const connect = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -49,13 +49,13 @@ app.use(express_1.default.json());
 app.use((0, cookie_parser_1.default)());
 app.use((0, cors_1.default)({
     credentials: true,
-    origin: "http://localhost:3001",
+    origin: ["http://copydeck.grayshapes.co/", "http://localhost:3001"],
 }));
-app.use("/api/writing", openai_1.default);
-app.use("/api/story", writing_1.default);
-app.use("/api/auth", auth_1.default);
-app.use("/api/users", users_1.default);
-app.post('/api/logout', (req, res) => {
+app.use("/writing", openai_1.default);
+app.use("/story", writing_1.default);
+app.use("/auth", auth_1.default);
+app.use("/users", users_1.default);
+app.post('/logout', (req, res) => {
     res.cookie('token', '').json(true);
 });
 app.use((err, req, res, next) => {
@@ -68,7 +68,7 @@ app.use((err, req, res, next) => {
         stack: err.stack,
     });
 });
-app.listen(process.env.PORT, () => {
+app.listen(PORT, () => {
     connect();
     console.log("Connected to backend.");
 });

@@ -12,7 +12,7 @@ const app: Express = express();
 dotenv.config();
 mongoose.set("strictQuery", false);
 
-// const PORT: number = process.env.PORT || 8800;
+const PORT: number = process.env.PORT || 8800;
 const MONGO_URL: string | undefined = process.env.MONGO;
 
 const connect = async () => {
@@ -42,16 +42,16 @@ app.use(cookieParser());
 app.use(
   cors({
     credentials: true,
-    origin: "http://localhost:3001",
+    origin: ["http://copydeck.grayshapes.co/", "http://localhost:3001"],
   })
 );
 
-app.use("/api/writing", openAiRoute);
-app.use("/api/story", writingRoute);
-app.use("/api/auth", authRoute);
-app.use("/api/users", usersRoute);
+app.use("/writing", openAiRoute);
+app.use("/story", writingRoute);
+app.use("/auth", authRoute);
+app.use("/users", usersRoute);
 
-app.post('/api/logout', (req, res) => {
+app.post('/logout', (req, res) => {
   res.cookie('token', '').json(true);
 });
 
@@ -66,7 +66,7 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   });
 });
 
-app.listen(process.env.PORT, () => {
+app.listen(PORT, () => {
   connect();
   console.log("Connected to backend.");
 });

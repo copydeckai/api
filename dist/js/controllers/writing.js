@@ -54,10 +54,10 @@ const fetchStory = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
 exports.fetchStory = fetchStory;
 const fetchAuthorStories = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const userData = yield getUserDataFromReq(req);
-    const _b = req.query, { query } = _b, others = __rest(_b, ["query"]);
+    const _b = req.query, { search } = _b, others = __rest(_b, ["search"]);
     try {
-        const regexPattern = new RegExp(query, "i");
-        const results = yield Writing_1.default.find(Object.assign({ title: { $regex: regexPattern }, isDeleted: false, authorId: userData.id }, others)).sort({ updatedAt: -1 }).limit(req.query.limit);
+        const regexPattern = new RegExp(search, "i");
+        const results = yield Writing_1.default.find(Object.assign({ title: { $regex: regexPattern }, isDeleted: false, authorId: userData.id }, others)).sort({ updatedAt: -1 });
         res.status(200).json(results);
     }
     catch (err) {

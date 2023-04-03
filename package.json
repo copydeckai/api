@@ -11,22 +11,6 @@
   "author": "Abednego Edet",
   "license": "ISC",
   "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "cookie-parser": "^1.4.6",
-    "cors": "^2.8.5",
-    "dotenv": "^16.0.0",
-    "express": "^4.18.1",
-    "fs": "^0.0.1-security",
-    "jsonwebtoken": "^8.5.1",
-    "mongoose": "^6.3.1",
-    "nodemailer": "^6.8.0",
-    "nodemailer-express-handlebars": "^6.0.0",
-    "openai": "^3.1.0",
-    "passport": "^0.6.0",
-    "passport-google-oauth": "^2.0.0",
-    "path": "^0.12.7"
-  },
-  "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
     "@types/cookie-parser": "^1.4.3",
     "@types/cors": "^2.8.6",
@@ -37,7 +21,21 @@
     "@types/node": "^14.0.14",
     "@types/nodemailer": "^6.4.7",
     "@types/nodemailer-express-handlebars": "^4.0.2",
+    "bcryptjs": "^2.4.3",
     "concurrently": "^5.2.0",
-    "nodemon": "^2.0.16"
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "express": "^4.18.1",
+    "fs": "^0.0.1-security",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.3.1",
+    "nodemailer": "^6.8.0",
+    "nodemailer-express-handlebars": "^6.0.0",
+    "nodemon": "^2.0.16",
+    "openai": "^3.1.0",
+    "passport": "^0.6.0",
+    "passport-google-oauth": "^2.0.0",
+    "path": "^0.12.7"
   }
 }

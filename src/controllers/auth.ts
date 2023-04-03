@@ -10,7 +10,7 @@ import jwt from "jsonwebtoken";
 dotenv.config();
 const jwtSecret = process.env.JWT as string;
 
-function getUserDataFromReq(req) {
+function getUserDataFromReq(req: Request) {
   return new Promise((resolve, _reject) => {
     jwt.verify(req.cookies.token, jwtSecret, {}, async (err, userData) => {
       if (err) {
@@ -57,7 +57,7 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
 
     const isMatch = await bcrypt.compare(
       req.body.password,
-      user.password
+      user?.password
     );
     if (!isMatch)
       return next(createError(400, "Wrong password or email"));
@@ -165,7 +165,7 @@ export const resetPasswordPost = async (req: Request, res: Response, next: NextF
 		try {
 			const isMatchPassword = await bcrypt.compare(
 				password,
-				user.password
+				user?.password
 				);
 				if (isMatchPassword)
 				return next(createError(400, "New password cannot be similar as previous password"));
@@ -201,7 +201,7 @@ export const changePassword = async (req: Request, res: Response, next: NextFunc
   const userData: any = await getUserDataFromReq(req);
 	const { newPassword } = req.body;
 
-  const user = await User.findOne({ _id: userData.id });
+  const user: any = await User.findOne({ _id: userData.id });
 	// if (!user) return next(createError(404, "User not found!"));
 
   try {
@@ -225,7 +225,7 @@ export const changePassword = async (req: Request, res: Response, next: NextFunc
       }
       );
       const content = `Your copydeck account password has been updated.`
-      await sendEmail(user.email, "Password has been changed", content, "", "reset-done");
+      await sendEmail(user?.email, "Password has been changed", content, "", "reset-done");
   
       res.status(200).send("Password updated.");
     } catch (err) {

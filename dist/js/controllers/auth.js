@@ -74,7 +74,7 @@ const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
         // if (!user.isActive) return next(createError(403, "Account hasn\'t been verified"));
         if (user.isBanned)
             return next((0, error_1.createError)(401, "User has been banned"));
-        const isMatch = yield bcryptjs_1.default.compare(req.body.password, user.password);
+        const isMatch = yield bcryptjs_1.default.compare(req.body.password, user === null || user === void 0 ? void 0 : user.password);
         if (!isMatch)
             return next((0, error_1.createError)(400, "Wrong password or email"));
         const _a = user._doc, { password, isAdmin, isActive } = _a, otherDetails = __rest(_a, ["password", "isAdmin", "isActive"]);
@@ -167,7 +167,7 @@ const resetPasswordPost = (req, res, next) => __awaiter(void 0, void 0, void 0, 
     try {
         payload = jsonwebtoken_1.default.verify(token, jwtSecret);
         try {
-            const isMatchPassword = yield bcryptjs_1.default.compare(password, user.password);
+            const isMatchPassword = yield bcryptjs_1.default.compare(password, user === null || user === void 0 ? void 0 : user.password);
             if (isMatchPassword)
                 return next((0, error_1.createError)(400, "New password cannot be similar as previous password"));
             const verify = jsonwebtoken_1.default.verify(token, jwtSecret);
@@ -214,7 +214,7 @@ const changePassword = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
             },
         });
         const content = `Your copydeck account password has been updated.`;
-        yield (0, mailer_1.default)(user.email, "Password has been changed", content, "", "reset-done");
+        yield (0, mailer_1.default)(user === null || user === void 0 ? void 0 : user.email, "Password has been changed", content, "", "reset-done");
         res.status(200).send("Password updated.");
     }
     catch (err) {

@@ -9,7 +9,7 @@ import jwt from "jsonwebtoken";
 dotenv.config();
 const jwtSecret = process.env.JWT as string;
 
-function getUserDataFromReq(req) {
+function getUserDataFromReq(req: Request) {
   return new Promise((resolve, _reject) => {
     jwt.verify(req.cookies.token, jwtSecret, {}, async (err, userData) => {
       if (err) {
@@ -45,15 +45,15 @@ export const fetchAuthorStories = async (
   next: NextFunction
 ): Promise<void> => {
   const userData: any = await getUserDataFromReq(req);
-  const { query,...others } = req.query;
+  const { search,...others } = req.query;
   try {
-    const regexPattern = new RegExp(query, "i");
+    const regexPattern: any = new RegExp(search as string, "i");
     const results = await Writing.find({ 
       title: { $regex: regexPattern },
       isDeleted: false,
       authorId: userData.id,
       ...others
-    }).sort({ updatedAt: -1 }).limit(req.query.limit);
+    }).sort({ updatedAt: -1 });
     res.status(200).json(results);
   } catch (err) {
     next(err);

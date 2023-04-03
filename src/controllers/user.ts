@@ -7,7 +7,7 @@ import jwt from "jsonwebtoken";
 dotenv.config();
 const jwtSecret = process.env.JWT as string;
 
-function getUserDataFromReq(req) {
+function getUserDataFromReq(req: Request) {
   return new Promise((resolve, _reject) => {
     jwt.verify(req.cookies.token, jwtSecret, {}, async (err, userData) => {
       if (err) {
