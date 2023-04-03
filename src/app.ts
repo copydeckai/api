@@ -46,6 +46,10 @@ app.use(
   })
 );
 
+app.get('/status', (req, res) => {
+  res.json('We up! 🚀');
+});
+
 app.use("/writing", openAiRoute);
 app.use("/story", writingRoute);
 app.use("/auth", authRoute);

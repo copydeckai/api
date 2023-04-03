@@ -51,6 +51,9 @@ app.use((0, cors_1.default)({
     credentials: true,
     origin: ["http://copydeck.grayshapes.co/", "http://localhost:3001"],
 }));
+app.get('/status', (req, res) => {
+    res.json('We up! 🚀');
+});
 app.use("/writing", openai_1.default);
 app.use("/story", writing_1.default);
 app.use("/auth", auth_1.default);
@@ -68,7 +71,7 @@ app.use((err, req, res, next) => {
         stack: err.stack,
     });
 });
-app.listen(() => {
+app.listen(process.env.PORT || 8800, () => {
     connect();
     console.log("Connected to backend.");
 });
