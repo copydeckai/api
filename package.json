@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/app.js",
   "scripts": {
-    "build": "tsc cd client && npm install && npm run build",
+    "build": "tsc",
     "start": "concurrently \"tsc -w\" \"node dist/js/app.js\"",
     "dev": "concurrently \"tsc -w\" \"nodemon dist/js/app.js\""
   },
