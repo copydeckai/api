@@ -42,11 +42,11 @@ app.use(cookieParser());
 app.use(
   cors({
     credentials: true,
-    origin: ["http://copydeck.grayshapes.co/", "http://localhost:3001"],
+    origin: ["https://copydeck.grayshapes.co", "http://localhost:3001"],
   })
 );
 
-app.get('/status', (req, res) => {
+app.get("/status", (req, res) => {
   res.json('We up! 🚀');
 });
 
@@ -55,7 +55,7 @@ app.use("/story", writingRoute);
 app.use("/auth", authRoute);
 app.use("/users", usersRoute);
 
-app.post('/logout', (req, res) => {
+app.post("/logout", (req, res) => {
   res.cookie('token', '').json(true);
 });
 

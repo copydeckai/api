@@ -49,16 +49,16 @@ app.use(express_1.default.json());
 app.use((0, cookie_parser_1.default)());
 app.use((0, cors_1.default)({
     credentials: true,
-    origin: ["http://copydeck.grayshapes.co/", "http://localhost:3001"],
+    origin: ["https://copydeck.grayshapes.co", "http://localhost:3001"],
 }));
-app.get('/status', (req, res) => {
+app.get("/status", (req, res) => {
     res.json('We up! 🚀');
 });
 app.use("/writing", openai_1.default);
 app.use("/story", writing_1.default);
 app.use("/auth", auth_1.default);
 app.use("/users", users_1.default);
-app.post('/logout', (req, res) => {
+app.post("/logout", (req, res) => {
     res.cookie('token', '').json(true);
 });
 app.use((err, req, res, next) => {
