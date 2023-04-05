@@ -18,7 +18,7 @@ router.put("/update", verifyToken_1.verifyUser, user_1.updateUser);
 //DELETE
 router.delete("/:id", verifyToken_1.verifyUser, user_1.deleteUser);
 //GET
-router.get("/:id", verifyToken_1.verifyUser, user_1.getUser);
+router.get("/:id", user_1.getUser);
 //Public GET
 router.get("/:id/fetch", user_1.getUser);
 //GET ALL
