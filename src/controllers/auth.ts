@@ -39,7 +39,7 @@ export const register = async (req: Request, res: Response, next: NextFunction):
 	const token = newUser.generateVerificationToken();
 	// const verificationToken = newUser.token();
 	// Email the user a unique verification link
-	const link = `http://localhost:3001/verify-identity/${newUser.id}/${token}`
+	const link = `https://copydeck.grayshapes.co/verify-identity/${newUser.id}/${token}`
 	await sendEmail(email, "Confirm Account", link, firstName, "signup-confirm");
     
     res.status(200).send("Verfication email sent");
@@ -114,14 +114,15 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
 		expiresIn: "5m",
 	  });
 
-	  const link = `http://localhost:3000/reset-password/${user._id}/${token}`;
+	  const link = `https://copydeck.grayshapes.co/reset-password/${user._id}/${token}`;
 		const email = req.body.email
 
 		await sendEmail(email, "Password Reset", link, "", "reset-password");
 
 		res.status(200).send("Password reset link sent");
 	} catch (err) {
-	  next(err);
+	  next(createError(500, "Something went wrong"));
+    console.log(err);
 	}
   };
 

@@ -57,7 +57,7 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
         const token = newUser.generateVerificationToken();
         // const verificationToken = newUser.token();
         // Email the user a unique verification link
-        const link = `http://localhost:3001/verify-identity/${newUser.id}/${token}`;
+        const link = `https://copydeck.grayshapes.co/verify-identity/${newUser.id}/${token}`;
         yield (0, mailer_1.default)(email, "Confirm Account", link, firstName, "signup-confirm");
         res.status(200).send("Verfication email sent");
     }
@@ -126,13 +126,14 @@ const forgotPassword = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
         const token = jsonwebtoken_1.default.sign({ email: user.email, id: user._id }, jwtSecret, {
             expiresIn: "5m",
         });
-        const link = `http://localhost:3000/reset-password/${user._id}/${token}`;
+        const link = `https://copydeck.grayshapes.co/reset-password/${user._id}/${token}`;
         const email = req.body.email;
         yield (0, mailer_1.default)(email, "Password Reset", link, "", "reset-password");
         res.status(200).send("Password reset link sent");
     }
     catch (err) {
-        next(err);
+        next((0, error_1.createError)(500, "Something went wrong"));
+        console.log(err);
     }
 });
 exports.forgotPassword = forgotPassword;
