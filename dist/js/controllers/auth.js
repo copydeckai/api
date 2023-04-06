@@ -23,7 +23,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.verifyEmail = exports.changePassword = exports.resetPasswordPost = exports.resetPassword = exports.forgotPassword = exports.getUserDetails = exports.login = exports.register = void 0;
+exports.verifyEmail = exports.changePassword = exports.resetPasswordPost = exports.resetPassword = exports.forgotPassword = exports.getUserDetails = exports.login = exports.resendConfirmEmail = exports.register = void 0;
 // import { IUser } from "./../../types/user"
 const User_1 = __importDefault(require("../models/User"));
 const mailer_1 = __importDefault(require("../utils/mailer"));
@@ -59,13 +59,37 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
         // Email the user a unique verification link
         const link = `https://copydeck.grayshapes.co/verify-identity/${newUser.id}/${token}`;
         yield (0, mailer_1.default)(email, "Confirm Account", link, firstName, "signup-confirm");
-        res.status(200).send("Verfication email sent");
+        res.status(200);
+        // .send({message: "Verfication email sent"});
     }
     catch (err) {
         next(err);
     }
 });
 exports.register = register;
+const resendConfirmEmail = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const userData = yield getUserDataFromReq(req);
+    try {
+        const user = yield User_1.default.findOne({ _id: userData.id });
+        console.log(user);
+        // Generate token with user data
+        const token = user === null || user === void 0 ? void 0 : user.generateVerificationToken();
+        // const token = jwt.sign({ email: userData.email, id: userData._id }, jwtSecret, {
+        // 	expiresIn: "10m",
+        //   });
+        // const verificationToken = newUser.token();
+        // Email the user a unique verification link
+        if (user) {
+            const link = `https://copydeck.grayshapes.co/verify-identity/${userData.id}/${token}`;
+            yield (0, mailer_1.default)(user.email, "Confirm Account", link, user.firstName, "signup-confirm");
+            res.status(200).send({ message: "Verfication email sent" });
+        }
+    }
+    catch (err) {
+        next(err);
+    }
+});
+exports.resendConfirmEmail = resendConfirmEmail;
 const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = yield User_1.default.findOne({ email: req.body.email });
@@ -129,7 +153,9 @@ const forgotPassword = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
         const link = `https://copydeck.grayshapes.co/reset-password/${user._id}/${token}`;
         const email = req.body.email;
         yield (0, mailer_1.default)(email, "Password Reset", link, "", "reset-password");
-        res.status(200).send("Password reset link sent");
+        res.status(200).send({
+            message: "Password reset link sent"
+        });
     }
     catch (err) {
         next((0, error_1.createError)(500, "Something went wrong"));
@@ -183,7 +209,7 @@ const resetPasswordPost = (req, res, next) => __awaiter(void 0, void 0, void 0, 
             });
             const content = `Your copydeck account password has been changed.`;
             yield (0, mailer_1.default)(email, "Password Reset Done", content, "", "reset-done");
-            res.status(200).send("Password reset done.");
+            res.status(200).send({ message: "Password reset done." });
         }
         catch (err) {
             console.log(err);
@@ -216,7 +242,9 @@ const changePassword = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
         });
         const content = `Your copydeck account password has been updated.`;
         yield (0, mailer_1.default)(user === null || user === void 0 ? void 0 : user.email, "Password has been changed", content, "", "reset-done");
-        res.status(200).send("Password updated.");
+        res.status(200).send({
+            message: "Password updated."
+        });
     }
     catch (err) {
         console.log(err);
