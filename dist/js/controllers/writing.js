@@ -70,7 +70,7 @@ const storeWriting = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
     try {
         const newWriting = new Writing_1.default(Object.assign({}, req.body));
         yield newWriting.save();
-        res.status(200).send("Created new writing");
+        res.status(200).send({ message: "Created new writing" });
     }
     catch (err) {
         next(err);
@@ -90,7 +90,7 @@ exports.updateStory = updateStory;
 const deleteStory = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield Writing_1.default.findByIdAndDelete(req.params.id);
-        res.status(200).json("Story has been deleted.");
+        res.status(200).send({ message: "Story has been deleted." });
     }
     catch (err) {
         next(err);
