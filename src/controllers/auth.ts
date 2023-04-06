@@ -20,6 +20,7 @@ function getUserDataFromReq(req: Request) {
     });
   });
 }
+
 export const register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { email, firstName } = req.body;
   try {
@@ -42,7 +43,31 @@ export const register = async (req: Request, res: Response, next: NextFunction):
 	const link = `https://copydeck.grayshapes.co/verify-identity/${newUser.id}/${token}`
 	await sendEmail(email, "Confirm Account", link, firstName, "signup-confirm");
     
-    res.status(200).send("Verfication email sent");
+    res.status(200)
+    // .send({message: "Verfication email sent"});
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const resendConfirmEmail = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  const userData: any = await getUserDataFromReq(req);
+  try {
+    const user = await User.findOne({ _id: userData.id });
+    console.log(user);
+	// Generate token with user data
+	  const token = user?.generateVerificationToken();
+  // const token = jwt.sign({ email: userData.email, id: userData._id }, jwtSecret, {
+	// 	expiresIn: "10m",
+	//   });
+	// const verificationToken = newUser.token();
+	// Email the user a unique verification link
+  if (user) {
+    const link = `https://copydeck.grayshapes.co/verify-identity/${userData.id}/${token}`
+	  await sendEmail(user.email, "Confirm Account", link, user.firstName, "signup-confirm");
+    
+    res.status(200).send({message: "Verfication email sent"});
+  }
   } catch (err) {
     next(err);
   }
@@ -119,7 +144,9 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
 
 		await sendEmail(email, "Password Reset", link, "", "reset-password");
 
-		res.status(200).send("Password reset link sent");
+		res.status(200).send({
+              message: "Password reset link sent"
+        });
 	} catch (err) {
 	  next(createError(500, "Something went wrong"));
     console.log(err);
@@ -187,7 +214,7 @@ export const resetPasswordPost = async (req: Request, res: Response, next: NextF
 				const content = `Your copydeck account password has been changed.`
 				await sendEmail(email, "Password Reset Done", content, "", "reset-done");
 		
-				res.status(200).send("Password reset done.");
+				res.status(200).send({message: "Password reset done."});
 			} catch (err) {
 			  console.log(err);
 			  next(err);
@@ -228,7 +255,9 @@ export const changePassword = async (req: Request, res: Response, next: NextFunc
       const content = `Your copydeck account password has been updated.`
       await sendEmail(user?.email, "Password has been changed", content, "", "reset-done");
   
-      res.status(200).send("Password updated.");
+      res.status(200).send({
+        message: "Password updated."
+        });
     } catch (err) {
       console.log(err);
       next(err);
@@ -256,7 +285,6 @@ export const verifyEmail = async (req: Request, res: Response, next: NextFunctio
     try{
 		const user = await User.findOne({ _id: id });
 		if (!user) return next(createError(404, "User not found!"));
-
         user.isActive = true;
         await user.save();
         return res.status(200).send({
