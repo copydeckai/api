@@ -5,7 +5,11 @@
     "outDir": "dist/js",
     "rootDir": "src",
     "strict": true,
+    "sourceMap": true,
+    "noImplicitReturns": true, 
+    "moduleResolution": "node", 
     "esModuleInterop": true,
+    "baseUrl": ".",    
     "forceConsistentCasingInFileNames": true,
 	"typeRoots": ["./node_modules/@types", "./src/types"],
 	"types": [

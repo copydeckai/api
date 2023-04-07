@@ -31,7 +31,7 @@ const sendEmail = (email, subject, contentLink, name, template) => __awaiter(voi
             },
         });
         // verify connection configuration
-        transporter.verify(function (error, success) {
+        transporter.verify((error, success) => {
             if (error) {
                 console.log(error);
             }
@@ -46,26 +46,26 @@ const sendEmail = (email, subject, contentLink, name, template) => __awaiter(voi
                 defaultLayout: template,
             },
             viewPath: path_1.default.resolve(__dirname, 'emails'),
-            extName: '.hbs'
+            extName: '.hbs',
         };
         transporter.use('compile', (0, nodemailer_express_handlebars_1.default)(handlebarOptions));
         const mailOptions = {
             from: `Copydeck Inc. <${process.env.EMAIL}>`,
             to: email,
-            subject: subject,
+            subject,
             template,
             context: {
                 email,
                 name,
-                link: contentLink
-            }
+                link: contentLink,
+            },
         };
-        yield transporter.sendMail(mailOptions, function (error, info) {
+        yield transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
-                console.log("Unable to send email: " + error);
+                console.log(`Unable to send email: ${error}`);
             }
             else {
-                console.log("Email sent: " + info.response);
+                console.log(`Email sent: ${info.response}`);
             }
         });
     }
@@ -75,3 +75,4 @@ const sendEmail = (email, subject, contentLink, name, template) => __awaiter(voi
 });
 exports.sendEmail = sendEmail;
 exports.default = exports.sendEmail;
+//# sourceMappingURL=mailer.js.map

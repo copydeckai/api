@@ -13,14 +13,15 @@ const router = (0, express_1.Router)();
 // router.get("/checkadmin/:id", verifyAdmin, (req,res,next)=>{
 //   res.send("hello admin, you are logged in and you can delete all accounts")
 // })
-//UPDATE
-router.put("/update", verifyToken_1.verifyUser, user_1.updateUser);
-//DELETE
-router.delete("/:id", verifyToken_1.verifyUser, user_1.deleteUser);
-//GET
-router.get("/:id", user_1.getUser);
-//Public GET
-router.get("/:id/fetch", user_1.getUser);
-//GET ALL
-router.get("/", verifyToken_1.verifyAdmin, user_1.getUsers);
+// UPDATE
+router.put('/update', verifyToken_1.verifyUser, user_1.updateUser);
+// DELETE
+router.delete('/:id', verifyToken_1.verifyUser, user_1.deleteUser);
+// GET
+router.get('/:id', user_1.getUser);
+// Public GET
+router.get('/:id/fetch', user_1.getUser);
+// GET ALL
+router.get('/', verifyToken_1.verifyAdmin, user_1.getUsers);
 exports.default = router;
+//# sourceMappingURL=users.js.map

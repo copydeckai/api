@@ -1,0 +1,1 @@
+{"version":3,"file":"openai.js","sourceRoot":"","sources":["../../../src/routes/openai.ts"],"names":[],"mappings":";;AAAA,qCAAiC;AACjC,kDAAoE;AAEpE,mCAAmC;AACnC,MAAM,MAAM,GAAW,IAAA,gBAAM,GAAE,CAAC;AAEhC,MAAM,CAAC,IAAI,CAAC,aAAa,EAAE,mBAAU,CAAC,CAAC;AACvC,MAAM,CAAC,IAAI,CAAC,OAAO,EAAE,aAAI,CAAC,CAAC;AAC3B,MAAM,CAAC,IAAI,CAAC,YAAY,EAAE,kBAAS,CAAC,CAAC;AAErC,kBAAe,MAAM,CAAC"}

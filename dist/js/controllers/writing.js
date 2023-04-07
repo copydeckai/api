@@ -24,15 +24,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getStory = exports.deleteStory = exports.updateStory = exports.storeWriting = exports.fetchAuthorStories = exports.fetchStory = void 0;
+const dotenv_1 = __importDefault(require("dotenv"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const Writing_1 = __importDefault(require("../models/Writing"));
 // import sendEmail from "../utils/mailer";
 // import bcrypt from "bcryptjs";
-const dotenv_1 = __importDefault(require("dotenv"));
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+// import createError from '../utils/error';
 dotenv_1.default.config();
 const jwtSecret = process.env.JWT;
 function getUserDataFromReq(req) {
-    return new Promise((resolve, _reject) => {
+    return new Promise((resolve) => {
         jsonwebtoken_1.default.verify(req.cookies.token, jwtSecret, {}, (err, userData) => __awaiter(this, void 0, void 0, function* () {
             if (err) {
                 throw err;
@@ -56,7 +57,7 @@ const fetchAuthorStories = (req, res, next) => __awaiter(void 0, void 0, void 0,
     const userData = yield getUserDataFromReq(req);
     const _b = req.query, { search } = _b, others = __rest(_b, ["search"]);
     try {
-        const regexPattern = new RegExp(search, "i");
+        const regexPattern = new RegExp(search, 'i');
         const results = yield Writing_1.default.find(Object.assign({ title: { $regex: regexPattern }, isDeleted: false, authorId: userData.id }, others)).sort({ updatedAt: -1 });
         res.status(200).json(results);
     }
@@ -70,7 +71,7 @@ const storeWriting = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
     try {
         const newWriting = new Writing_1.default(Object.assign({}, req.body));
         yield newWriting.save();
-        res.status(200).send({ message: "Created new writing" });
+        res.status(200).send({ message: 'Created new writing' });
     }
     catch (err) {
         next(err);
@@ -90,7 +91,7 @@ exports.updateStory = updateStory;
 const deleteStory = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield Writing_1.default.findByIdAndDelete(req.params.id);
-        res.status(200).send({ message: "Story has been deleted." });
+        res.status(200).send({ message: 'Story has been deleted.' });
     }
     catch (err) {
         next(err);
@@ -109,3 +110,4 @@ const getStory = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.getStory = getStory;
+//# sourceMappingURL=writing.js.map

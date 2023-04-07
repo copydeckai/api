@@ -14,12 +14,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getUsers = exports.getUser = exports.deleteUser = exports.updateUser = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
-const User_1 = __importDefault(require("../models/User"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const User_1 = __importDefault(require("../models/User"));
 dotenv_1.default.config();
 const jwtSecret = process.env.JWT;
 function getUserDataFromReq(req) {
-    return new Promise((resolve, _reject) => {
+    return new Promise((resolve) => {
         jsonwebtoken_1.default.verify(req.cookies.token, jwtSecret, {}, (err, userData) => __awaiter(this, void 0, void 0, function* () {
             if (err) {
                 throw err;
@@ -40,7 +40,9 @@ function getUserDataFromReq(req) {
 //     next(err);
 //   }
 // }
-const updateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const updateUser = (req, res
+// next: NextFunction
+) => __awaiter(void 0, void 0, void 0, function* () {
     const userData = yield getUserDataFromReq(req);
     try {
         const filter = { _id: userData.id };
@@ -52,7 +54,7 @@ const updateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     catch (err) {
         // next(createError(500, 'Server error occured'));
         throw res.status(500).json({ message: 'Server error occured' });
-        next(err);
+        // next(err);
     }
 });
 exports.updateUser = updateUser;
@@ -91,3 +93,4 @@ const getUsers = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.getUsers = getUsers;
+//# sourceMappingURL=user.js.map

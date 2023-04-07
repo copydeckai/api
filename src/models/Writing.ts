@@ -1,7 +1,7 @@
-import { IWriting } from "./../types/writing";
-import mongoose, { model, Schema } from "mongoose";
+import { model, Schema } from 'mongoose';
+import { IWriting } from '../types/writing';
 
-const WritingSchema = new mongoose.Schema(
+const WritingSchema = new Schema(
   {
     title: {
       type: String,
@@ -26,10 +26,10 @@ const WritingSchema = new mongoose.Schema(
       required: true,
     },
     authorAvatar: {
-      type: String
+      type: String,
     },
     views: {
-      type: Number
+      type: Number,
     },
     charCount: {
       type: Number,
@@ -53,7 +53,7 @@ const WritingSchema = new mongoose.Schema(
     status: {
       type: String,
       required: true,
-      default: "active",
+      default: 'active',
     },
     isPublic: {
       type: Boolean,
@@ -74,4 +74,4 @@ const WritingSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default model<IWriting>("Writing", WritingSchema);
+export default model<IWriting>('Writing', WritingSchema);

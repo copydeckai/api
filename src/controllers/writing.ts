@@ -1,16 +1,16 @@
-import { Response, Request, NextFunction } from "express";
-import Writing from "../models/Writing";
+import { Response, Request, NextFunction } from 'express';
+import dotenv from 'dotenv';
+import jwt from 'jsonwebtoken';
+import Writing from '../models/Writing';
 // import sendEmail from "../utils/mailer";
 // import bcrypt from "bcryptjs";
-import dotenv from "dotenv";
-import { createError } from "../utils/error";
-import jwt from "jsonwebtoken";
+// import createError from '../utils/error';
 
 dotenv.config();
 const jwtSecret = process.env.JWT as string;
 
 function getUserDataFromReq(req: Request) {
-  return new Promise((resolve, _reject) => {
+  return new Promise((resolve) => {
     jwt.verify(req.cookies.token, jwtSecret, {}, async (err, userData) => {
       if (err) {
         throw err;
@@ -45,14 +45,14 @@ export const fetchAuthorStories = async (
   next: NextFunction
 ): Promise<void> => {
   const userData: any = await getUserDataFromReq(req);
-  const { search,...others } = req.query;
+  const { search, ...others } = req.query;
   try {
-    const regexPattern: any = new RegExp(search as string, "i");
-    const results = await Writing.find({ 
+    const regexPattern: any = new RegExp(search as string, 'i');
+    const results = await Writing.find({
       title: { $regex: regexPattern },
       isDeleted: false,
       authorId: userData.id,
-      ...others
+      ...others,
     }).sort({ updatedAt: -1 });
     res.status(200).json(results);
   } catch (err) {
@@ -72,7 +72,7 @@ export const storeWriting = async (
     });
 
     await newWriting.save();
-    res.status(200).send({message: "Created new writing"});
+    res.status(200).send({ message: 'Created new writing' });
   } catch (err) {
     next(err);
   }
@@ -102,22 +102,23 @@ export const deleteStory = async (
 ): Promise<void> => {
   try {
     await Writing.findByIdAndDelete(req.params.id);
-    res.status(200).send({message: "Story has been deleted."});
+    res.status(200).send({ message: 'Story has been deleted.' });
   } catch (err) {
     next(err);
   }
 };
 
-export const getStory = async (req: Request,
-	res: Response,
-	next: NextFunction
-  ): Promise<void> => {
+export const getStory = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   const userData: any = await getUserDataFromReq(req);
-	const { url } = req.params;
-	try {
-	  const story = await Writing.find({authorId: userData.id, urlString: url});
-	  res.status(200).json(story);
-	} catch (err) {
-	  next(err);
-	}
-  };
+  const { url } = req.params;
+  try {
+    const story = await Writing.find({ authorId: userData.id, urlString: url });
+    res.status(200).json(story);
+  } catch (err) {
+    next(err);
+  }
+};
