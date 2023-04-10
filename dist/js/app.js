@@ -24,6 +24,7 @@ const openai_1 = __importDefault(require("./routes/openai"));
 const auth_1 = __importDefault(require("./routes/auth"));
 const writing_1 = __importDefault(require("./routes/writing"));
 const users_1 = __importDefault(require("./routes/users"));
+const errorHandler_1 = __importDefault(require("./error/errorHandler"));
 const app = (0, express_1.default)();
 dotenv_1.default.config();
 mongoose_1.default.set('strictQuery', false);
@@ -34,9 +35,6 @@ const connect = () => __awaiter(void 0, void 0, void 0, function* () {
     yield mongoose_1.default.connect(`${MONGO_URL}`);
     console.log('Connected to mongoDB.');
 });
-mongoose_1.default.connection.on('disconnected', () => {
-    console.log('mongoDB disconnected!');
-});
 // middlewares
 app.use((req, res, next) => {
     // res.header("Access-Control-Allow-Origin", "*");
@@ -46,13 +44,13 @@ app.use((req, res, next) => {
 });
 app.use(express_1.default.json());
 app.use((0, cookie_parser_1.default)());
-app.use((0, express_session_1.default)({ secret: JWT_TOKEN, resave: false, saveUninitialized: false }));
-app.use(passport_1.default.initialize());
-app.use(passport_1.default.session());
 app.use((0, cors_1.default)({
     credentials: true,
     origin: ['https://copydeck.grayshapes.co', 'http://localhost:3001'],
 }));
+app.use((0, express_session_1.default)({ secret: JWT_TOKEN, resave: false, saveUninitialized: false }));
+app.use(passport_1.default.initialize());
+app.use(passport_1.default.session());
 app.get('/status', (req, res) => {
     res.json('We up! 🚀');
 });
@@ -63,16 +61,7 @@ app.use('/users', users_1.default);
 app.post('/logout', (req, res) => {
     res.cookie('token', '').json(true);
 });
-app.use((err, req, res) => {
-    const errorStatus = err.status || 500;
-    const errorMessage = err.message || 'Something went wrong!';
-    return res.status(errorStatus).json({
-        success: false,
-        status: errorStatus,
-        message: errorMessage,
-        stack: err.stack,
-    });
-});
+app.use(errorHandler_1.default);
 app.listen(process.env.PORT || 8800, () => {
     connect();
     console.log('Connected to backend.');
