@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.passportSession = exports.verifyAdmin = exports.verifyUser = exports.verifyToken = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const error_1 = __importDefault(require("./error"));
+const CreateError_1 = __importDefault(require("../error/CreateError"));
 // declare module 'express-serve-static-core' {
 //   interface Response {
 //     error: (status: number, message: string) => Response;
@@ -15,11 +15,11 @@ const error_1 = __importDefault(require("./error"));
 const verifyToken = (req, res, next, func) => {
     const { token } = req.cookies;
     if (!token) {
-        return next((0, error_1.default)(401, 'You are not authenticated!'));
+        return next(CreateError_1.default.badRequest('You are not authenticated!'));
     }
     jsonwebtoken_1.default.verify(token, process.env.JWT, (err, user) => {
         if (err)
-            return next((0, error_1.default)(403, 'Token is not valid!'));
+            return next(CreateError_1.default.badRequest('Token is not valid!'));
         req.user = user;
         next();
     });
@@ -31,7 +31,7 @@ const verifyUser = (req, res, next) => {
             next();
         }
         else {
-            return next((0, error_1.default)(401, 'Unauthorized!'));
+            return next(CreateError_1.default.unauthorized('Unauthorized!'));
         }
     });
 };
@@ -42,7 +42,7 @@ const verifyAdmin = (req, res, next) => {
             next();
         }
         else {
-            return next((0, error_1.default)(401, 'Unauthorized!'));
+            return next(CreateError_1.default.unauthorized('Unauthorized!'));
         }
     });
 };

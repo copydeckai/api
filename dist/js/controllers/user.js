@@ -40,57 +40,33 @@ function getUserDataFromReq(req) {
 //     next(err);
 //   }
 // }
-const updateUser = (req, res
-// next: NextFunction
-) => __awaiter(void 0, void 0, void 0, function* () {
+const updateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const userData = yield getUserDataFromReq(req);
-    try {
-        const filter = { _id: userData.id };
-        const updateDoc = { $set: req.body };
-        const options = { upsert: true };
-        yield User_1.default.updateOne(filter, updateDoc, options);
-        res.status(200).json(req.body);
-    }
-    catch (err) {
-        // next(createError(500, 'Server error occured'));
-        throw res.status(500).json({ message: 'Server error occured' });
-        // next(err);
-    }
+    const filter = { _id: userData.id };
+    const updateDoc = { $set: req.body };
+    const options = { upsert: true };
+    yield User_1.default.updateOne(filter, updateDoc, options);
+    res.status(200).json(req.body);
 });
 exports.updateUser = updateUser;
 const deleteUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const deletedUser = yield User_1.default.findByIdAndDelete(req.params.id);
-        const allUsers = yield User_1.default.find();
-        res.status(200).json({
-            message: 'User has been deleted',
-            todo: deletedUser,
-            todos: allUsers,
-        });
-    }
-    catch (err) {
-        next(err);
-    }
+    const deletedUser = yield User_1.default.findByIdAndDelete(req.params.id);
+    const allUsers = yield User_1.default.find();
+    res.status(200).json({
+        message: 'User has been deleted',
+        todo: deletedUser,
+        todos: allUsers,
+    });
 });
 exports.deleteUser = deleteUser;
 const getUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const user = yield User_1.default.findById(req.params.id);
-        res.status(200).json(user);
-    }
-    catch (err) {
-        next(err);
-    }
+    const user = yield User_1.default.findById(req.params.id);
+    res.status(200).json(user);
 });
 exports.getUser = getUser;
 const getUsers = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const users = yield User_1.default.find();
-        res.status(200).json(users);
-    }
-    catch (err) {
-        next(err);
-    }
+    const users = yield User_1.default.find();
+    res.status(200).json(users);
 });
 exports.getUsers = getUsers;
 //# sourceMappingURL=user.js.map

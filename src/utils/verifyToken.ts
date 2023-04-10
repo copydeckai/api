@@ -3,7 +3,7 @@ import { Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 // import { IUser } from "../types/user";
 import { IGetUserAuthInfoRequest } from '../types/authRequest';
-import createError from './error';
+import CreateError from '../error/CreateError';
 
 // declare module 'express-serve-static-core' {
 //   interface Response {
@@ -20,11 +20,11 @@ export const verifyToken = (
 ) => {
   const { token } = req.cookies;
   if (!token) {
-    return next(createError(401, 'You are not authenticated!'));
+    return next(CreateError.badRequest('You are not authenticated!'));
   }
 
   jwt.verify(token, process.env.JWT as string, (err: any, user: any) => {
-    if (err) return next(createError(403, 'Token is not valid!'));
+    if (err) return next(CreateError.badRequest('Token is not valid!'));
     req.user = user;
     next();
   });
@@ -39,7 +39,7 @@ export const verifyUser = (
     if (req.user.id === req.params.id || req.user.isAdmin) {
       next();
     } else {
-      return next(createError(401, 'Unauthorized!'));
+      return next(CreateError.unauthorized('Unauthorized!'));
     }
   });
 };
@@ -53,7 +53,7 @@ export const verifyAdmin = (
     if (req.user.isAdmin) {
       next();
     } else {
-      return next(createError(401, 'Unauthorized!'));
+      return next(CreateError.unauthorized('Unauthorized!'));
     }
   });
 };

@@ -2,7 +2,7 @@
   "name": "@copydeck/api",
   "version": "1.0.0",
   "description": "",
-  "main": "dis/js/app.js",
+  "main": "dist/js/app.js",
   "scripts": {
     "build": "tsc",
     "start": "concurrently \"tsc -w\" \"node dist/js/app.js\"",

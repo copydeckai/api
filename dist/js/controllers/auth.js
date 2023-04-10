@@ -29,7 +29,7 @@ const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const passport_1 = __importDefault(require("passport"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const error_1 = __importDefault(require("../utils/error"));
+const CreateError_1 = __importDefault(require("../error/CreateError"));
 const mailer_1 = __importDefault(require("../utils/mailer"));
 const User_1 = __importDefault(require("../models/User"));
 const verifyToken_1 = require("../utils/verifyToken");
@@ -48,138 +48,113 @@ function getUserDataFromReq(req) {
 }
 const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, firstName } = req.body;
-    try {
-        const userExist = yield User_1.default.findOne({ email });
-        if (userExist)
-            return next((0, error_1.default)(422, 'User with email already exists'));
-        const salt = bcryptjs_1.default.genSaltSync(10);
-        const hash = bcryptjs_1.default.hashSync(req.body.password, salt);
-        const newUser = new User_1.default(Object.assign(Object.assign({}, req.body), { password: hash }));
-        yield newUser.save();
-        // Generate token with id
-        const token = newUser.generateVerificationToken();
-        // const verificationToken = newUser.token();
-        // Email the user a unique verification link
-        const link = `https://copydeck.grayshapes.co/verify-identity/${newUser.id}/${token}`;
-        yield (0, mailer_1.default)(email, 'Confirm Account', link, firstName, 'signup-confirm');
-        res.status(200);
-        // .send({message: "Verfication email sent"});
-    }
-    catch (err) {
-        next(err);
-    }
+    const userExist = yield User_1.default.findOne({ email });
+    if (userExist)
+        return next(CreateError_1.default.badRequest('User with email already exists'));
+    const salt = bcryptjs_1.default.genSaltSync(10);
+    const hash = bcryptjs_1.default.hashSync(req.body.password, salt);
+    const newUser = new User_1.default(Object.assign(Object.assign({}, req.body), { password: hash }));
+    yield newUser.save();
+    // Generate token with id
+    const token = newUser.generateVerificationToken();
+    // const verificationToken = newUser.token();
+    // Email the user a unique verification link
+    const link = `https://copydeck.grayshapes.co/verify-identity/${newUser.id}/${token}`;
+    yield (0, mailer_1.default)(email, 'Confirm Account', link, firstName, 'signup-confirm');
+    res.status(200).send({ message: 'Account created' });
 });
 exports.register = register;
-const resendConfirmEmail = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const resendConfirmEmail = (req, res, 
+// eslint-disable-next-line no-unused-vars
+next) => __awaiter(void 0, void 0, void 0, function* () {
     const userData = yield getUserDataFromReq(req);
-    try {
-        const user = yield User_1.default.findOne({ _id: userData.id });
-        console.log(user);
-        // Generate token with user data
-        const token = user === null || user === void 0 ? void 0 : user.generateVerificationToken();
-        // const token = jwt.sign({ email: userData.email, id: userData._id }, jwtSecret, {
-        // 	expiresIn: "10m",
-        //   });
-        // const verificationToken = newUser.token();
-        // Email the user a unique verification link
-        if (user) {
-            const link = `https://copydeck.grayshapes.co/verify-identity/${userData.id}/${token}`;
-            yield (0, mailer_1.default)(user.email, 'Confirm Account', link, user.firstName, 'signup-confirm');
-            res.status(200).send({ message: 'Verfication email sent' });
-        }
-    }
-    catch (err) {
-        next(err);
+    const user = yield User_1.default.findOne({ _id: userData.id });
+    console.log(user);
+    // Generate token with user data
+    const token = user === null || user === void 0 ? void 0 : user.generateVerificationToken();
+    // const token = jwt.sign({ email: userData.email, id: userData._id }, jwtSecret, {
+    // 	expiresIn: "10m",
+    //   });
+    // const verificationToken = newUser.token();
+    // Email the user a unique verification link
+    if (user) {
+        const link = `https://copydeck.grayshapes.co/verify-identity/${userData.id}/${token}`;
+        yield (0, mailer_1.default)(user.email, 'Confirm Account', link, user.firstName, 'signup-confirm');
+        res.status(200).send({ message: 'Verfication email sent' });
     }
 });
 exports.resendConfirmEmail = resendConfirmEmail;
 const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const user = yield User_1.default.findOne({ email: req.body.email });
-        if (!user)
-            return next((0, error_1.default)(404, 'Wrong password or email'));
-        // if (!user.isActive) return next(createError(403, "Account hasn\'t been verified"));
-        if (user.isBanned)
-            return next((0, error_1.default)(401, 'User has been banned'));
-        const isMatch = yield bcryptjs_1.default.compare(req.body.password, user === null || user === void 0 ? void 0 : user.password);
-        if (!isMatch)
-            return next((0, error_1.default)(400, 'Wrong password or email'));
-        const _a = user._doc, { password, isAdmin, isActive } = _a, otherDetails = __rest(_a, ["password", "isAdmin", "isActive"]);
-        jsonwebtoken_1.default.sign({ id: user._id, isAdmin: user.isAdmin, isActive: user.isActive }, jwtSecret, {}, (err, token) => {
-            if (err) {
-                throw err;
-            }
-            res
-                .cookie('token', token, {
-                httpOnly: true,
-            })
-                .status(200)
-                .json(Object.assign(Object.assign({}, otherDetails), { isAdmin, isActive }));
-        });
-    }
-    catch (err) {
-        next(err);
-    }
+    const user = yield User_1.default.findOne({ email: req.body.email });
+    if (!user)
+        return next(CreateError_1.default.badRequest('Account does not exist'));
+    // if (!user.isActive) return next(CreateError.badRequest("Account hasn\'t been verified"));
+    if (user.isBanned)
+        return next(CreateError_1.default.unauthorized('User has been banned'));
+    const isMatch = yield bcryptjs_1.default.compare(req.body.password, user === null || user === void 0 ? void 0 : user.password);
+    if (!isMatch)
+        return next(CreateError_1.default.badRequest('Wrong password or email'));
+    const _a = user._doc, { password, isAdmin, isActive } = _a, otherDetails = __rest(_a, ["password", "isAdmin", "isActive"]);
+    jsonwebtoken_1.default.sign({ id: user._id, isAdmin: user.isAdmin, isActive: user.isActive }, jwtSecret, {}, (err, token) => {
+        if (err) {
+            throw err;
+        }
+        res
+            .cookie('token', token, {
+            httpOnly: true,
+        })
+            .status(200)
+            .json(Object.assign(Object.assign({}, otherDetails), { isAdmin, isActive }));
+    });
 });
 exports.login = login;
 const getUserDetails = (req, res
 // next: NextFunction
 ) => __awaiter(void 0, void 0, void 0, function* () {
     const { token } = req.cookies;
-    try {
-        if (token) {
-            jsonwebtoken_1.default.verify(token, jwtSecret, {}, (err, userData) => __awaiter(void 0, void 0, void 0, function* () {
-                if (err) {
-                    throw err;
-                }
-                const query = { _id: userData.id };
-                const account = yield User_1.default.findOne(query);
-                res.status(200).json(account);
-            }));
-        }
-        else {
-            res.status(401).json(null);
-        }
+    if (token) {
+        jsonwebtoken_1.default.verify(token, jwtSecret, {}, (err, userData) => __awaiter(void 0, void 0, void 0, function* () {
+            if (err) {
+                throw err;
+            }
+            const query = { _id: userData.id };
+            const account = yield User_1.default.findOne(query);
+            res.status(200).json(account);
+        }));
     }
-    catch (err) {
-        throw res.status(500).json({ message: 'Server error occured' });
-        // next(err);
+    else {
+        res.status(401).json(null);
     }
 });
 exports.getUserDetails = getUserDetails;
 const forgotPassword = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const user = yield User_1.default.findOne({ email: req.body.email });
-        if (!user)
-            return next((0, error_1.default)(404, 'User not found!'));
-        const token = jsonwebtoken_1.default.sign({ email: user.email, id: user._id }, jwtSecret, {
-            expiresIn: '5m',
-        });
-        const link = `https://copydeck.grayshapes.co/reset-password/${user._id}/${token}`;
-        const { email } = req.body;
-        yield (0, mailer_1.default)(email, 'Password Reset', link, '', 'reset-password');
-        res.status(200).send({
-            message: 'Password reset link sent',
-        });
-    }
-    catch (err) {
-        next((0, error_1.default)(500, 'Something went wrong'));
-        console.log(err);
-    }
+    const user = yield User_1.default.findOne({ email: req.body.email });
+    if (!user)
+        return next(CreateError_1.default.badRequest('User not found!'));
+    const token = jsonwebtoken_1.default.sign({ email: user.email, id: user._id }, jwtSecret, {
+        expiresIn: '5m',
+    });
+    const link = `https://copydeck.grayshapes.co/reset-password/${user._id}/${token}`;
+    const { email } = req.body;
+    yield (0, mailer_1.default)(email, 'Password Reset', link, '', 'reset-password');
+    res.status(200).send({
+        message: 'Password reset link sent',
+    });
 });
 exports.forgotPassword = forgotPassword;
 const resetPassword = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id, token } = req.params;
     const user = yield User_1.default.findOne({ _id: id });
     if (!user)
-        return next((0, error_1.default)(404, 'User not found!'));
+        return next(CreateError_1.default.badRequest('User not found!'));
     let payload = null;
     try {
         // eslint-disable-next-line no-unused-vars
         payload = jsonwebtoken_1.default.verify(token, jwtSecret);
     }
     catch (err) {
-        return res.status(500).send(`Invalid token: ${err}`);
+        console.log(err);
+        return res.status(500).send(`Invalid token`);
     }
     // try {
     // const verify = jwt.verify(token, process.env.JWT);
@@ -195,7 +170,7 @@ const resetPasswordPost = (req, res, next) => __awaiter(void 0, void 0, void 0, 
     const { email, password } = req.body;
     const user = yield User_1.default.findOne({ _id: id });
     if (!user)
-        return next((0, error_1.default)(404, 'User not found!'));
+        return next(CreateError_1.default.badRequest('User not found!'));
     let payload = null;
     try {
         // eslint-disable-next-line no-unused-vars
@@ -203,7 +178,7 @@ const resetPasswordPost = (req, res, next) => __awaiter(void 0, void 0, void 0, 
         try {
             const isMatchPassword = yield bcryptjs_1.default.compare(password, user === null || user === void 0 ? void 0 : user.password);
             if (isMatchPassword)
-                return next((0, error_1.default)(400, 'New password cannot be similar as previous password'));
+                return next(CreateError_1.default.badRequest('New password cannot be similar as previous password'));
             // const verify = jwt.verify(token, jwtSecret);
             const salt = bcryptjs_1.default.genSaltSync(10);
             const hash = yield bcryptjs_1.default.hashSync(password, salt);
@@ -225,7 +200,7 @@ const resetPasswordPost = (req, res, next) => __awaiter(void 0, void 0, void 0, 
         }
     }
     catch (err) {
-        return next((0, error_1.default)(500, `Link token expired`));
+        return next(CreateError_1.default.internal(`Link token expired, get a new link`));
     }
 });
 exports.resetPasswordPost = resetPasswordPost;
@@ -233,31 +208,24 @@ const changePassword = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
     const userData = yield getUserDataFromReq(req);
     const { newPassword } = req.body;
     const user = yield User_1.default.findOne({ _id: userData.id });
-    // if (!user) return next(createError(404, "User not found!"));
-    try {
-        const isMatchPassword = yield bcryptjs_1.default.compare(newPassword, user.password);
-        if (isMatchPassword)
-            return next((0, error_1.default)(400, "Try a password you've not used before."));
-        const salt = bcryptjs_1.default.genSaltSync(10);
-        const hash = yield bcryptjs_1.default.hashSync(newPassword, salt);
-        yield User_1.default.updateOne({
-            _id: userData.id,
-        }, {
-            $set: {
-                password: hash,
-            },
-        });
-        const content = `Your copydeck account password has been updated.`;
-        yield (0, mailer_1.default)(user === null || user === void 0 ? void 0 : user.email, 'Password has been changed', content, '', 'reset-done');
-        res.status(200).send({
-            message: 'Password updated.',
-        });
-    }
-    catch (err) {
-        console.log(err);
-        next(err);
-        //   res.json({ status: "Something Went Wrong" });
-    }
+    // if (!user) return next(CreateError.badRequest("User not found!"));
+    const isMatchPassword = yield bcryptjs_1.default.compare(newPassword, user.password);
+    if (isMatchPassword)
+        return next(CreateError_1.default.badRequest("Try a password you've not used before."));
+    const salt = bcryptjs_1.default.genSaltSync(10);
+    const hash = yield bcryptjs_1.default.hashSync(newPassword, salt);
+    yield User_1.default.updateOne({
+        _id: userData.id,
+    }, {
+        $set: {
+            password: hash,
+        },
+    });
+    const content = `Your copydeck account password has been updated.`;
+    yield (0, mailer_1.default)(user === null || user === void 0 ? void 0 : user.email, 'Password has been changed', content, '', 'reset-done');
+    res.status(200).send({
+        message: 'Password updated.',
+    });
 });
 exports.changePassword = changePassword;
 const verifyEmail = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -274,23 +242,16 @@ const verifyEmail = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         payload = jsonwebtoken_1.default.verify(token, jwtSecret);
     }
     catch (err) {
-        return next((0, error_1.default)(500, `Invalid token: ${err}`));
+        return next(CreateError_1.default.internal(`Invalid token: ${err}`));
     }
-    try {
-        const user = yield User_1.default.findOne({ _id: id });
-        if (!user)
-            return next((0, error_1.default)(404, 'User not found!'));
-        user.isActive = true;
-        yield user.save();
-        return res.status(200).send({
-            message: 'Account Verified',
-        });
-    }
-    catch (err) {
-        console.log(err);
-        next(err);
-        // return res.status(500).send(err);
-    }
+    const user = yield User_1.default.findOne({ _id: id });
+    if (!user)
+        return next(CreateError_1.default.badRequest('User not found!'));
+    user.isActive = true;
+    yield user.save();
+    return res.status(200).send({
+        message: 'Account Verified',
+    });
 });
 exports.verifyEmail = verifyEmail;
 const googlePassport = () => __awaiter(void 0, void 0, void 0, function* () {

@@ -10,7 +10,7 @@ import {
   CreateEmbeddingRequest,
   OpenAIApi,
 } from 'openai';
-import createError from '../utils/error';
+import CreateError from '../error/CreateError';
 
 dotenv.config();
 
@@ -25,16 +25,12 @@ export const completion = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  try {
-    if (req.method !== 'POST')
-      return next(createError(405, 'Only POST requests allowed'));
-    const body = req.body as CreateCompletionRequest;
+  if (req.method !== 'POST')
+    return next(CreateError.badRequest('Only POST requests allowed'));
+  const body = req.body as CreateCompletionRequest;
 
-    const request = await openai.createCompletion(body);
-    res.status(200).json(request.data);
-  } catch (err) {
-    next(err);
-  }
+  const request = await openai.createCompletion(body);
+  res.status(200).json(request.data);
 };
 
 export const edit = async (
@@ -42,16 +38,12 @@ export const edit = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  try {
-    if (req.method !== 'POST')
-      return next(createError(405, 'Only POST requests allowed'));
-    const body = req.body as CreateEditRequest;
+  if (req.method !== 'POST')
+    return next(CreateError.badRequest('Only POST requests allowed'));
+  const body = req.body as CreateEditRequest;
 
-    const request = await openai.createEdit(body);
-    res.status(200).json(request.data);
-  } catch (err) {
-    next(err);
-  }
+  const request = await openai.createEdit(body);
+  res.status(200).json(request.data);
 };
 
 export const embedding = async (
@@ -59,14 +51,10 @@ export const embedding = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  try {
-    if (req.method !== 'POST')
-      return next(createError(405, 'Only POST requests allowed'));
-    const body = req.body as CreateEmbeddingRequest;
+  if (req.method !== 'POST')
+    return next(CreateError.badRequest('Only POST requests allowed'));
+  const body = req.body as CreateEmbeddingRequest;
 
-    const request = await openai.createEmbedding(body);
-    res.status(200).json(request.data);
-  } catch (err) {
-    next(err);
-  }
+  const request = await openai.createEmbedding(body);
+  res.status(200).json(request.data);
 };

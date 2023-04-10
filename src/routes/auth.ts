@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Response, Request, NextFunction } from 'express';
 import {
   changePassword,
   getUserDetails,
@@ -16,7 +16,12 @@ import { verifyUser } from '../utils/verifyToken';
 
 const router: Router = Router();
 
-router.post('/register', register);
+const use =
+  (func: any) => (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(func(req, res, next)).catch(next);
+  };
+
+router.post('/register', use(register));
 router.post('/login', login);
 router.get('/fetch', getUserDetails);
 router.post('/forgot-password', forgotPassword);

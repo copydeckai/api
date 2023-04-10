@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 import passport from 'passport';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
-import createError from '../utils/error';
+import CreateError from '../error/CreateError';
 import sendEmail from '../utils/mailer';
 import User from '../models/User';
 import { passportSession } from '../utils/verifyToken';
@@ -30,70 +30,56 @@ export const register = async (
   next: NextFunction
 ): Promise<void> => {
   const { email, firstName } = req.body;
-  try {
-    const userExist = await User.findOne({ email });
-    if (userExist)
-      return next(createError(422, 'User with email already exists'));
+  const userExist = await User.findOne({ email });
+  if (userExist)
+    return next(CreateError.badRequest('User with email already exists'));
 
-    const salt = bcrypt.genSaltSync(10);
-    const hash = bcrypt.hashSync(req.body.password, salt);
+  const salt = bcrypt.genSaltSync(10);
+  const hash = bcrypt.hashSync(req.body.password, salt);
 
-    const newUser = new User({
-      ...req.body,
-      password: hash,
-    });
+  const newUser = new User({
+    ...req.body,
+    password: hash,
+  });
 
-    await newUser.save();
-    // Generate token with id
-    const token = newUser.generateVerificationToken();
-    // const verificationToken = newUser.token();
-    // Email the user a unique verification link
-    const link = `https://copydeck.grayshapes.co/verify-identity/${newUser.id}/${token}`;
-    await sendEmail(
-      email,
-      'Confirm Account',
-      link,
-      firstName,
-      'signup-confirm'
-    );
+  await newUser.save();
+  // Generate token with id
+  const token = newUser.generateVerificationToken();
+  // const verificationToken = newUser.token();
+  // Email the user a unique verification link
+  const link = `https://copydeck.grayshapes.co/verify-identity/${newUser.id}/${token}`;
+  await sendEmail(email, 'Confirm Account', link, firstName, 'signup-confirm');
 
-    res.status(200);
-    // .send({message: "Verfication email sent"});
-  } catch (err) {
-    next(err);
-  }
+  res.status(200).send({ message: 'Account created' });
 };
 
 export const resendConfirmEmail = async (
   req: Request,
   res: Response,
+  // eslint-disable-next-line no-unused-vars
   next: NextFunction
 ): Promise<void> => {
   const userData: any = await getUserDataFromReq(req);
-  try {
-    const user = await User.findOne({ _id: userData.id });
-    console.log(user);
-    // Generate token with user data
-    const token = user?.generateVerificationToken();
-    // const token = jwt.sign({ email: userData.email, id: userData._id }, jwtSecret, {
-    // 	expiresIn: "10m",
-    //   });
-    // const verificationToken = newUser.token();
-    // Email the user a unique verification link
-    if (user) {
-      const link = `https://copydeck.grayshapes.co/verify-identity/${userData.id}/${token}`;
-      await sendEmail(
-        user.email,
-        'Confirm Account',
-        link,
-        user.firstName,
-        'signup-confirm'
-      );
+  const user = await User.findOne({ _id: userData.id });
+  console.log(user);
+  // Generate token with user data
+  const token = user?.generateVerificationToken();
+  // const token = jwt.sign({ email: userData.email, id: userData._id }, jwtSecret, {
+  // 	expiresIn: "10m",
+  //   });
+  // const verificationToken = newUser.token();
+  // Email the user a unique verification link
+  if (user) {
+    const link = `https://copydeck.grayshapes.co/verify-identity/${userData.id}/${token}`;
+    await sendEmail(
+      user.email,
+      'Confirm Account',
+      link,
+      user.firstName,
+      'signup-confirm'
+    );
 
-      res.status(200).send({ message: 'Verfication email sent' });
-    }
-  } catch (err) {
-    next(err);
+    res.status(200).send({ message: 'Verfication email sent' });
   }
 };
 
@@ -102,34 +88,31 @@ export const login = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  try {
-    const user = await User.findOne({ email: req.body.email });
-    if (!user) return next(createError(404, 'Wrong password or email'));
-    // if (!user.isActive) return next(createError(403, "Account hasn\'t been verified"));
-    if (user.isBanned) return next(createError(401, 'User has been banned'));
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) return next(CreateError.badRequest('Account does not exist'));
+  // if (!user.isActive) return next(CreateError.badRequest("Account hasn\'t been verified"));
+  if (user.isBanned)
+    return next(CreateError.unauthorized('User has been banned'));
 
-    const isMatch = await bcrypt.compare(req.body.password, user?.password);
-    if (!isMatch) return next(createError(400, 'Wrong password or email'));
-    const { password, isAdmin, isActive, ...otherDetails } = user._doc;
-    jwt.sign(
-      { id: user._id, isAdmin: user.isAdmin, isActive: user.isActive },
-      jwtSecret,
-      {},
-      (err: any, token: any) => {
-        if (err) {
-          throw err;
-        }
-        res
-          .cookie('token', token, {
-            httpOnly: true,
-          })
-          .status(200)
-          .json({ ...otherDetails, isAdmin, isActive });
+  const isMatch = await bcrypt.compare(req.body.password, user?.password);
+  if (!isMatch) return next(CreateError.badRequest('Wrong password or email'));
+  const { password, isAdmin, isActive, ...otherDetails } = user._doc;
+  jwt.sign(
+    { id: user._id, isAdmin: user.isAdmin, isActive: user.isActive },
+    jwtSecret,
+    {},
+    (err: any, token: any) => {
+      if (err) {
+        throw err;
       }
-    );
-  } catch (err) {
-    next(err);
-  }
+      res
+        .cookie('token', token, {
+          httpOnly: true,
+        })
+        .status(200)
+        .json({ ...otherDetails, isAdmin, isActive });
+    }
+  );
 };
 
 export const getUserDetails = async (
@@ -138,23 +121,18 @@ export const getUserDetails = async (
   // next: NextFunction
 ): Promise<void> => {
   const { token } = req.cookies;
-  try {
-    if (token) {
-      jwt.verify(token, jwtSecret, {}, async (err: any, userData: any) => {
-        if (err) {
-          throw err;
-        }
-        const query = { _id: userData.id };
-        const account = await User.findOne(query);
+  if (token) {
+    jwt.verify(token, jwtSecret, {}, async (err: any, userData: any) => {
+      if (err) {
+        throw err;
+      }
+      const query = { _id: userData.id };
+      const account = await User.findOne(query);
 
-        res.status(200).json(account);
-      });
-    } else {
-      res.status(401).json(null);
-    }
-  } catch (err) {
-    throw res.status(500).json({ message: 'Server error occured' });
-    // next(err);
+      res.status(200).json(account);
+    });
+  } else {
+    res.status(401).json(null);
   }
 };
 
@@ -163,26 +141,21 @@ export const forgotPassword = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  try {
-    const user = await User.findOne({ email: req.body.email });
-    if (!user) return next(createError(404, 'User not found!'));
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) return next(CreateError.badRequest('User not found!'));
 
-    const token = jwt.sign({ email: user.email, id: user._id }, jwtSecret, {
-      expiresIn: '5m',
-    });
+  const token = jwt.sign({ email: user.email, id: user._id }, jwtSecret, {
+    expiresIn: '5m',
+  });
 
-    const link = `https://copydeck.grayshapes.co/reset-password/${user._id}/${token}`;
-    const { email } = req.body;
+  const link = `https://copydeck.grayshapes.co/reset-password/${user._id}/${token}`;
+  const { email } = req.body;
 
-    await sendEmail(email, 'Password Reset', link, '', 'reset-password');
+  await sendEmail(email, 'Password Reset', link, '', 'reset-password');
 
-    res.status(200).send({
-      message: 'Password reset link sent',
-    });
-  } catch (err) {
-    next(createError(500, 'Something went wrong'));
-    console.log(err);
-  }
+  res.status(200).send({
+    message: 'Password reset link sent',
+  });
 };
 
 export const resetPassword = async (
@@ -192,14 +165,15 @@ export const resetPassword = async (
 ) => {
   const { id, token } = req.params;
   const user = await User.findOne({ _id: id });
-  if (!user) return next(createError(404, 'User not found!'));
+  if (!user) return next(CreateError.badRequest('User not found!'));
 
   let payload = null;
   try {
     // eslint-disable-next-line no-unused-vars
     payload = jwt.verify(token, jwtSecret);
   } catch (err) {
-    return res.status(500).send(`Invalid token: ${err}`);
+    console.log(err);
+    return res.status(500).send(`Invalid token`);
   }
 
   // try {
@@ -220,7 +194,7 @@ export const resetPasswordPost = async (
   const { email, password } = req.body;
 
   const user = await User.findOne({ _id: id });
-  if (!user) return next(createError(404, 'User not found!'));
+  if (!user) return next(CreateError.badRequest('User not found!'));
 
   let payload = null;
   try {
@@ -230,8 +204,7 @@ export const resetPasswordPost = async (
       const isMatchPassword = await bcrypt.compare(password, user?.password);
       if (isMatchPassword)
         return next(
-          createError(
-            400,
+          CreateError.badRequest(
             'New password cannot be similar as previous password'
           )
         );
@@ -259,7 +232,7 @@ export const resetPasswordPost = async (
       //   res.json({ status: "Something Went Wrong" });
     }
   } catch (err) {
-    return next(createError(500, `Link token expired`));
+    return next(CreateError.internal(`Link token expired, get a new link`));
   }
 };
 
@@ -272,42 +245,38 @@ export const changePassword = async (
   const { newPassword } = req.body;
 
   const user: any = await User.findOne({ _id: userData.id });
-  // if (!user) return next(createError(404, "User not found!"));
+  // if (!user) return next(CreateError.badRequest("User not found!"));
 
-  try {
-    const isMatchPassword = await bcrypt.compare(newPassword, user.password);
-    if (isMatchPassword)
-      return next(createError(400, "Try a password you've not used before."));
+  const isMatchPassword = await bcrypt.compare(newPassword, user.password);
+  if (isMatchPassword)
+    return next(
+      CreateError.badRequest("Try a password you've not used before.")
+    );
 
-    const salt = bcrypt.genSaltSync(10);
-    const hash = await bcrypt.hashSync(newPassword, salt);
-    await User.updateOne(
-      {
-        _id: userData.id,
+  const salt = bcrypt.genSaltSync(10);
+  const hash = await bcrypt.hashSync(newPassword, salt);
+  await User.updateOne(
+    {
+      _id: userData.id,
+    },
+    {
+      $set: {
+        password: hash,
       },
-      {
-        $set: {
-          password: hash,
-        },
-      }
-    );
-    const content = `Your copydeck account password has been updated.`;
-    await sendEmail(
-      user?.email,
-      'Password has been changed',
-      content,
-      '',
-      'reset-done'
-    );
+    }
+  );
+  const content = `Your copydeck account password has been updated.`;
+  await sendEmail(
+    user?.email,
+    'Password has been changed',
+    content,
+    '',
+    'reset-done'
+  );
 
-    res.status(200).send({
-      message: 'Password updated.',
-    });
-  } catch (err) {
-    console.log(err);
-    next(err);
-    //   res.json({ status: "Something Went Wrong" });
-  }
+  res.status(200).send({
+    message: 'Password updated.',
+  });
 };
 
 export const verifyEmail = async (
@@ -327,21 +296,15 @@ export const verifyEmail = async (
     // eslint-disable-next-line no-unused-vars
     payload = jwt.verify(token, jwtSecret);
   } catch (err) {
-    return next(createError(500, `Invalid token: ${err}`));
+    return next(CreateError.internal(`Invalid token: ${err}`));
   }
-  try {
-    const user = await User.findOne({ _id: id });
-    if (!user) return next(createError(404, 'User not found!'));
-    user.isActive = true;
-    await user.save();
-    return res.status(200).send({
-      message: 'Account Verified',
-    });
-  } catch (err) {
-    console.log(err);
-    next(err);
-    // return res.status(500).send(err);
-  }
+  const user = await User.findOne({ _id: id });
+  if (!user) return next(CreateError.badRequest('User not found!'));
+  user.isActive = true;
+  await user.save();
+  return res.status(200).send({
+    message: 'Account Verified',
+  });
 };
 
 export const googlePassport = async (): Promise<void> => {

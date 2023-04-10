@@ -4,7 +4,10 @@ const express_1 = require("express");
 const auth_1 = require("../controllers/auth");
 const verifyToken_1 = require("../utils/verifyToken");
 const router = (0, express_1.Router)();
-router.post('/register', auth_1.register);
+const use = (func) => (req, res, next) => {
+    Promise.resolve(func(req, res, next)).catch(next);
+};
+router.post('/register', use(auth_1.register));
 router.post('/login', auth_1.login);
 router.get('/fetch', auth_1.getUserDetails);
 router.post('/forgot-password', auth_1.forgotPassword);

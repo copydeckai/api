@@ -10,6 +10,7 @@ import openAiRoute from './routes/openai';
 import authRoute from './routes/auth';
 import writingRoute from './routes/writing';
 import usersRoute from './routes/users';
+import errorHandler from './error/errorHandler';
 
 const app: Express = express();
 dotenv.config();
@@ -23,11 +24,6 @@ const connect = async () => {
   await mongoose.connect(`${MONGO_URL}`);
   console.log('Connected to mongoDB.');
 };
-
-mongoose.connection.on('disconnected', () => {
-  console.log('mongoDB disconnected!');
-});
-
 // middlewares
 app.use((req: Request, res: Response, next: NextFunction) => {
   // res.header("Access-Control-Allow-Origin", "*");
@@ -39,17 +35,17 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 app.use(express.json());
 app.use(cookieParser());
 app.use(
-  session({ secret: JWT_TOKEN, resave: false, saveUninitialized: false })
-);
-app.use(passport.initialize());
-app.use(passport.session());
-
-app.use(
   cors({
     credentials: true,
     origin: ['https://copydeck.grayshapes.co', 'http://localhost:3001'],
   })
 );
+
+app.use(
+  session({ secret: JWT_TOKEN, resave: false, saveUninitialized: false })
+);
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.get('/status', (req, res) => {
   res.json('We up! 🚀');
@@ -64,16 +60,7 @@ app.post('/logout', (req, res) => {
   res.cookie('token', '').json(true);
 });
 
-app.use((err: any, req: Request, res: Response) => {
-  const errorStatus = err.status || 500;
-  const errorMessage = err.message || 'Something went wrong!';
-  return res.status(errorStatus).json({
-    success: false,
-    status: errorStatus,
-    message: errorMessage,
-    stack: err.stack,
-  });
-});
+app.use(errorHandler);
 
 app.listen(process.env.PORT || 8800, () => {
   connect();

@@ -1,8 +1,10 @@
+/* eslint-disable no-unused-vars */
 import { Response, Request, NextFunction } from 'express';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import { IUser } from '../types/user';
 import User from '../models/User';
+import CreateError from '../error/CreateError';
 
 dotenv.config();
 const jwtSecret = process.env.JWT as string;
@@ -33,21 +35,15 @@ function getUserDataFromReq(req: Request) {
 
 export const updateUser = async (
   req: Request,
-  res: Response
-  // next: NextFunction
+  res: Response,
+  next: NextFunction
 ): Promise<void> => {
   const userData: any = await getUserDataFromReq(req);
-  try {
-    const filter = { _id: userData.id };
-    const updateDoc = { $set: req.body };
-    const options = { upsert: true };
-    await User.updateOne(filter, updateDoc, options);
-    res.status(200).json(req.body);
-  } catch (err) {
-    // next(createError(500, 'Server error occured'));
-    throw res.status(500).json({ message: 'Server error occured' });
-    // next(err);
-  }
+  const filter = { _id: userData.id };
+  const updateDoc = { $set: req.body };
+  const options = { upsert: true };
+  await User.updateOne(filter, updateDoc, options);
+  res.status(200).json(req.body);
 };
 
 export const deleteUser = async (
@@ -55,19 +51,13 @@ export const deleteUser = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  try {
-    const deletedUser: IUser | null = await User.findByIdAndDelete(
-      req.params.id
-    );
-    const allUsers: IUser[] = await User.find();
-    res.status(200).json({
-      message: 'User has been deleted',
-      todo: deletedUser,
-      todos: allUsers,
-    });
-  } catch (err) {
-    next(err);
-  }
+  const deletedUser: IUser | null = await User.findByIdAndDelete(req.params.id);
+  const allUsers: IUser[] = await User.find();
+  res.status(200).json({
+    message: 'User has been deleted',
+    todo: deletedUser,
+    todos: allUsers,
+  });
 };
 
 export const getUser = async (
@@ -75,12 +65,8 @@ export const getUser = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  try {
-    const user: IUser | null = await User.findById(req.params.id);
-    res.status(200).json(user);
-  } catch (err) {
-    next(err);
-  }
+  const user: IUser | null = await User.findById(req.params.id);
+  res.status(200).json(user);
 };
 
 export const getUsers = async (
@@ -88,10 +74,6 @@ export const getUsers = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  try {
-    const users: IUser[] = await User.find();
-    res.status(200).json(users);
-  } catch (err) {
-    next(err);
-  }
+  const users: IUser[] = await User.find();
+  res.status(200).json(users);
 };
