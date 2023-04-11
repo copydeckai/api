@@ -4,16 +4,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
-const passport_local_mongoose_1 = __importDefault(require("passport-local-mongoose"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const UserSchema = new mongoose_1.Schema({
-    // userId: {
-    // 	type: mongoose.SchemaTypes.ObjectId,
-    // 	required: true,
-    // 	index: true
-    // },
+    googleId: {
+        required: false,
+    },
     firstName: {
         type: String,
         required: true,
@@ -42,6 +39,9 @@ const UserSchema = new mongoose_1.Schema({
         type: String,
         required: true,
     },
+    token: {
+        type: String,
+    },
     isAdmin: {
         type: Boolean,
         default: false,
@@ -61,7 +61,5 @@ UserSchema.methods.generateVerificationToken = function () {
     const verificationToken = jsonwebtoken_1.default.sign({ ID: user._id }, process.env.JWT, { expiresIn: '7d' });
     return verificationToken;
 };
-// Setting up the passport plugin
-UserSchema.plugin(passport_local_mongoose_1.default);
 exports.default = (0, mongoose_1.model)('User', UserSchema);
 //# sourceMappingURL=User.js.map

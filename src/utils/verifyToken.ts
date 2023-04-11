@@ -59,8 +59,13 @@ export const verifyAdmin = (
 };
 
 export const passportSession = (user: any) => {
-  const token = jwt.sign(user, process.env.JWT as string, {
-    expiresIn: '7d',
-  });
+  const { password, isAdmin, isActive, ...otherDetails } = user._doc;
+  const token = jwt.sign(
+    { id: user._id, isAdmin: user.isAdmin, isActive: user.isActive },
+    process.env.JWT as string,
+    {
+      expiresIn: '7d',
+    }
+  );
   return token;
 };

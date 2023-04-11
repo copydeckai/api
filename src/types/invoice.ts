@@ -5,11 +5,9 @@ interface DocumentResult<T> {
 }
 
 export interface IInvoice extends DocumentResult<IInvoice> {
-  title: string;
-  content: string;
-  charCount: number;
-  wordCount: number;
-  urlString: string;
+  invoiceId: string;
+  planType: string;
+  amount: number;
   status: string;
   isPublic: boolean;
   isDeleted: boolean;

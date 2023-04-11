@@ -5,6 +5,7 @@ interface DocumentResult<T> {
 }
 
 export interface IUser extends DocumentResult<IUser> {
+  googleId: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -14,5 +15,6 @@ export interface IUser extends DocumentResult<IUser> {
   isAdmin: boolean;
   isActive: boolean;
   isBanned: boolean;
+  token: string;
   generateVerificationToken: () => void;
 }

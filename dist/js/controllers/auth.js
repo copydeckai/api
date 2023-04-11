@@ -23,19 +23,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.googlePassportCallback = exports.googlePassport = exports.verifyEmail = exports.changePassword = exports.resetPasswordPost = exports.resetPassword = exports.forgotPassword = exports.getUserDetails = exports.login = exports.resendConfirmEmail = exports.register = void 0;
+exports.verifyEmail = exports.changePassword = exports.resetPasswordPost = exports.resetPassword = exports.forgotPassword = exports.getUserDetails = exports.login = exports.resendConfirmEmail = exports.register = void 0;
 // import { IUser } from "./../../types/user"
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
-const passport_1 = __importDefault(require("passport"));
+// import passport from 'passport';
 const dotenv_1 = __importDefault(require("dotenv"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const CreateError_1 = __importDefault(require("../error/CreateError"));
 const mailer_1 = __importDefault(require("../utils/mailer"));
 const User_1 = __importDefault(require("../models/User"));
-const verifyToken_1 = require("../utils/verifyToken");
+// import { passportSession } from '../utils/verifyToken';
 dotenv_1.default.config();
 const jwtSecret = process.env.JWT;
-const clientUrl = process.env.CLIENT_URL;
+// const clientUrl = process.env.CLIENT_URL as string;
 function getUserDataFromReq(req) {
     return new Promise((resolve) => {
         jsonwebtoken_1.default.verify(req.cookies.token, jwtSecret, {}, (err, userData) => __awaiter(this, void 0, void 0, function* () {
@@ -87,7 +87,7 @@ exports.resendConfirmEmail = resendConfirmEmail;
 const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield User_1.default.findOne({ email: req.body.email });
     if (!user)
-        return next(CreateError_1.default.badRequest('Account does not exist'));
+        return next(CreateError_1.default.badRequest('Email or password is incorrect'));
     // if (!user.isActive) return next(CreateError.badRequest("Account hasn\'t been verified"));
     if (user.isBanned)
         return next(CreateError_1.default.unauthorized('User has been banned'));
@@ -254,22 +254,20 @@ const verifyEmail = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
     });
 });
 exports.verifyEmail = verifyEmail;
-const googlePassport = () => __awaiter(void 0, void 0, void 0, function* () {
-    passport_1.default.authenticate('google', { scope: ['profile', 'email'] });
-});
-exports.googlePassport = googlePassport;
-const googlePassportCallback = () => __awaiter(void 0, void 0, void 0, function* () {
-    // eslint-disable-next-line no-unused-expressions
-    passport_1.default.authenticate('google', {
-        successRedirect: clientUrl,
-        failureRedirect: `/login`,
-        // eslint-disable-next-line no-sequences
-    }),
-        (req, res) => {
-            const token = (0, verifyToken_1.passportSession)(req.user);
-            res.cookie('token', token);
-            res.redirect(`/`);
-        };
-});
-exports.googlePassportCallback = googlePassportCallback;
+// export const googlePassport = async (): Promise<void> => {
+//   passport.authenticate('google', { scope: ['profile', 'email'] });
+// };
+// export const googlePassportCallback = async () => {
+//   // eslint-disable-next-line no-unused-expressions
+//   passport.authenticate('google', {
+//     successRedirect: clientUrl,
+//     failureRedirect: `/login`,
+//     // eslint-disable-next-line no-sequences
+//   }),
+//     (req: Request, res: Response) => {
+//       const token = passportSession(req.user);
+//       res.cookie('token', token);
+//       res.redirect(`/`);
+//     };
+// };
 //# sourceMappingURL=auth.js.map

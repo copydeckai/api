@@ -1,17 +1,17 @@
 import { Response, Request, NextFunction } from 'express';
 // import { IUser } from "./../../types/user"
 import bcrypt from 'bcryptjs';
-import passport from 'passport';
+// import passport from 'passport';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import CreateError from '../error/CreateError';
 import sendEmail from '../utils/mailer';
 import User from '../models/User';
-import { passportSession } from '../utils/verifyToken';
+// import { passportSession } from '../utils/verifyToken';
 
 dotenv.config();
 const jwtSecret = process.env.JWT as string;
-const clientUrl = process.env.CLIENT_URL as string;
+// const clientUrl = process.env.CLIENT_URL as string;
 
 function getUserDataFromReq(req: Request) {
   return new Promise((resolve) => {
@@ -89,7 +89,8 @@ export const login = async (
   next: NextFunction
 ): Promise<void> => {
   const user = await User.findOne({ email: req.body.email });
-  if (!user) return next(CreateError.badRequest('Account does not exist'));
+  if (!user)
+    return next(CreateError.badRequest('Email or password is incorrect'));
   // if (!user.isActive) return next(CreateError.badRequest("Account hasn\'t been verified"));
   if (user.isBanned)
     return next(CreateError.unauthorized('User has been banned'));
@@ -307,20 +308,20 @@ export const verifyEmail = async (
   });
 };
 
-export const googlePassport = async (): Promise<void> => {
-  passport.authenticate('google', { scope: ['profile', 'email'] });
-};
+// export const googlePassport = async (): Promise<void> => {
+//   passport.authenticate('google', { scope: ['profile', 'email'] });
+// };
 
-export const googlePassportCallback = async () => {
-  // eslint-disable-next-line no-unused-expressions
-  passport.authenticate('google', {
-    successRedirect: clientUrl,
-    failureRedirect: `/login`,
-    // eslint-disable-next-line no-sequences
-  }),
-    (req: Request, res: Response) => {
-      const token = passportSession(req.user);
-      res.cookie('token', token);
-      res.redirect(`/`);
-    };
-};
+// export const googlePassportCallback = async () => {
+//   // eslint-disable-next-line no-unused-expressions
+//   passport.authenticate('google', {
+//     successRedirect: clientUrl,
+//     failureRedirect: `/login`,
+//     // eslint-disable-next-line no-sequences
+//   }),
+//     (req: Request, res: Response) => {
+//       const token = passportSession(req.user);
+//       res.cookie('token', token);
+//       res.redirect(`/`);
+//     };
+// };

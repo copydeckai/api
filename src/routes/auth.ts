@@ -9,8 +9,8 @@ import {
   resetPasswordPost,
   verifyEmail,
   resendConfirmEmail,
-  googlePassport,
-  googlePassportCallback,
+  // googlePassport,
+  // googlePassportCallback,
 } from '../controllers/auth';
 import { verifyUser } from '../utils/verifyToken';
 
@@ -30,7 +30,7 @@ router.get('/reset-password/:id/:token', resetPassword);
 router.post('/reset-password/:id/:token', resetPasswordPost);
 router.post('/change-password', verifyUser, changePassword);
 router.get('/verify/:id/:token', verifyEmail);
-router.get('/google', googlePassport);
-router.get('/google/callback', googlePassportCallback);
+// router.get('/google', googlePassport);
+// router.get('/google/callback', googlePassportCallback);
 
 export default router;

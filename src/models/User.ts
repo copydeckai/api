@@ -1,5 +1,4 @@
 import { model, Schema } from 'mongoose';
-import passportLocalMongoose from 'passport-local-mongoose';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { IUser } from '../types/user';
@@ -8,11 +7,9 @@ dotenv.config();
 
 const UserSchema = new Schema(
   {
-    // userId: {
-    // 	type: mongoose.SchemaTypes.ObjectId,
-    // 	required: true,
-    // 	index: true
-    // },
+    googleId: {
+      required: false,
+    },
     firstName: {
       type: String,
       required: true,
@@ -41,6 +38,9 @@ const UserSchema = new Schema(
       type: String,
       required: true,
     },
+    token: {
+      type: String,
+    },
     isAdmin: {
       type: Boolean,
       default: false,
@@ -67,8 +67,5 @@ UserSchema.methods.generateVerificationToken = function () {
   );
   return verificationToken;
 };
-
-// Setting up the passport plugin
-UserSchema.plugin(passportLocalMongoose);
 
 export default model<IUser>('User', UserSchema);

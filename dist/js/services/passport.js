@@ -8,6 +8,7 @@ const passport_1 = __importDefault(require("passport"));
 const passport_google_oauth20_1 = require("passport-google-oauth20");
 const passport_jwt_1 = __importDefault(require("passport-jwt"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 // import passportLocal from 'passport-local';
 // import CreateError from '../error/CreateError';
 const User_1 = __importDefault(require("../models/User"));
@@ -43,6 +44,8 @@ passport_1.default.use(new passport_google_oauth20_1.Strategy({
             return done(null, user);
         }
         // Create new user
+        const salt = bcryptjs_1.default.genSaltSync(10);
+        const hash = bcryptjs_1.default.hashSync(accessToken + refreshToken, salt);
         const fullName = profile.displayName.split(' ');
         const firstName = fullName[0];
         const lastName = fullName[1];
@@ -54,6 +57,7 @@ passport_1.default.use(new passport_google_oauth20_1.Strategy({
             avatar: profile.photos[0].value,
             token: accessToken,
             isActive: true,
+            password: hash,
             aiUsage: {
                 credits: 5,
                 planType: 'basic',
@@ -62,6 +66,7 @@ passport_1.default.use(new passport_google_oauth20_1.Strategy({
         // Save user to database
         newUser.save((saveErr) => {
             if (saveErr) {
+                console.log(saveErr);
                 return done(saveErr);
             }
             return done(null, newUser);

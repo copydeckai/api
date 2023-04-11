@@ -13,6 +13,7 @@ module.exports = {
   rules: {
     'consistent-return': 'off',
     'no-underscore-dangle': 'off',
+    'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
     'prettier/prettier': [
       1,
       {
