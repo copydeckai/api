@@ -45,7 +45,7 @@ export const sendEmail = async (
     transporter.use('compile', handlebar(handlebarOptions));
 
     const mailOptions = {
-      from: `Copydeck Inc. <${process.env.EMAIL}>`,
+      from: `Copydeck <${process.env.EMAIL}>`,
       to: email,
       subject,
       template,

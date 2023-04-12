@@ -50,7 +50,7 @@ const sendEmail = (email, subject, contentLink, name, template) => __awaiter(voi
         };
         transporter.use('compile', (0, nodemailer_express_handlebars_1.default)(handlebarOptions));
         const mailOptions = {
-            from: `Copydeck Inc. <${process.env.EMAIL}>`,
+            from: `Copydeck <${process.env.EMAIL}>`,
             to: email,
             subject,
             template,
