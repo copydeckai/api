@@ -50,7 +50,7 @@ passport_1.default.use(new passport_google_oauth20_1.Strategy({
         const firstName = fullName[0];
         const lastName = fullName[1];
         const newUser = new User_1.default({
-            googleId: profile.id,
+            // googleId: profile.id,
             firstName,
             lastName,
             email: profile.emails[0].value,

@@ -3,13 +3,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+/* eslint-disable import/no-extraneous-dependencies */
 const mongoose_1 = require("mongoose");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const rand_token_1 = __importDefault(require("rand-token"));
 dotenv_1.default.config();
 const UserSchema = new mongoose_1.Schema({
-    googleId: {
+    username: {
         required: false,
+        default() {
+            return rand_token_1.default.generate(8);
+        },
     },
     firstName: {
         type: String,

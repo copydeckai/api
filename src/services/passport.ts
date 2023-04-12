@@ -52,7 +52,7 @@ passport.use(
         const firstName = fullName[0];
         const lastName = fullName[1];
         const newUser = new User({
-          googleId: profile.id,
+          // googleId: profile.id,
           firstName,
           lastName,
           email: profile.emails[0].value,
