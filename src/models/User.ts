@@ -2,19 +2,13 @@
 import { model, Schema } from 'mongoose';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import randToken from 'rand-token';
+// import randToken from 'rand-token';
 import { IUser } from '../types/user';
 
 dotenv.config();
 
 const UserSchema = new Schema(
   {
-    username: {
-      required: false,
-      default() {
-        return randToken.generate(8);
-      },
-    },
     firstName: {
       type: String,
       required: true,

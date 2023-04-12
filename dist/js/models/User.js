@@ -7,15 +7,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
-const rand_token_1 = __importDefault(require("rand-token"));
 dotenv_1.default.config();
 const UserSchema = new mongoose_1.Schema({
-    username: {
-        required: false,
-        default() {
-            return rand_token_1.default.generate(8);
-        },
-    },
     firstName: {
         type: String,
         required: true,
